@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14111c">
+<title>나만의 색 팔레트</title>
+<meta name="description" content="오늘의 감정을 고치지 말고 색으로 남겨 보세요. 에니어그램 4번(예술가) 이야기로 만든 감정 색 일기·가시를 꽃으로·감성 날씨 점검">
+<style>
+:root{--bg:#14111c;--card:#1e1929;--card2:#282236;--fg:#f3effa;--mut:#b2a8c6;--line:#3a3150;
+--lav:#c3a6ff;--pur:#8e6bd6;--ok:#9be3b5;--bad:#ff7b8a;--gold:#e8c66a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.55}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding:12px 14px 40px}
+h1{font-size:1.2rem;margin:6px 0}
+h1 small{display:block;font-size:.76rem;color:var(--mut);font-weight:400}
+.tabs{display:flex;gap:5px;margin:10px 0}
+.tabs button{flex:1;padding:9px 2px;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:10px;font-size:.84rem;font-weight:600}
+.tabs button.on{background:#3b2a63;color:#fff;border-color:#8e6bd6}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+h2{font-size:1rem;margin:2px 0 8px}
+.note{font-size:.86rem;color:var(--mut);margin:8px 0 0}
+.note b{color:var(--fg)}
+.btn{padding:12px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,#6f4bc4,#b48cff);color:#fff;font-weight:800;font-size:.95rem;flex:1}
+.btn.sec{background:var(--card2);border:1px solid var(--line);color:var(--fg);font-weight:700}
+.btn:disabled{opacity:.4}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* emotions */
+.emos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.emo{border:2px solid transparent;border-radius:12px;padding:8px 2px 6px;background:var(--card2);color:var(--fg);font-size:.8rem;display:flex;flex-direction:column;align-items:center;gap:4px}
+.emo i{width:28px;height:28px;border-radius:50%;display:block;box-shadow:inset 0 0 0 2px rgba(255,255,255,.15)}
+.emo.sel{border-color:#fff;background:#3a3150}
+.emo .lv{font-size:.66rem;color:var(--lav);min-height:1em}
+.sliders{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.sl{display:grid;grid-template-columns:70px 1fr 30px;gap:8px;align-items:center;font-size:.85rem}
+.sl input{width:100%;accent-color:var(--lav)}
+.swatch{margin-top:14px;border-radius:18px;height:190px;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.35);transition:background .5s}
+.swatch .nm{position:absolute;left:16px;right:16px;bottom:14px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.55)}
+.swatch .nm b{display:block;font-size:1.15rem;line-height:1.35}
+.swatch .nm span{font-size:.8rem;opacity:.9}
+.swatch .hex{position:absolute;right:14px;top:12px;font-size:.75rem;color:#fff;opacity:.85;font-family:ui-monospace,monospace;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.quote{margin-top:10px;font-size:.92rem;background:var(--card2);border-left:3px solid var(--lav);padding:9px 11px;border-radius:6px}
+input[type=text],textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:1rem;font-family:inherit}
+textarea{min-height:56px;resize:vertical}
+label.f{display:block;font-size:.84rem;color:var(--mut);margin:10px 0 4px}
+.hist{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}
+.hist button{aspect-ratio:1;border-radius:10px;border:1px solid rgba(255,255,255,.12);position:relative;padding:0}
+.hist button span{position:absolute;left:0;right:0;bottom:2px;font-size:.6rem;color:#fff;text-shadow:0 1px 3px #000}
+.empty{font-size:.85rem;color:var(--mut);text-align:center;padding:10px}
+/* thorns */
+.choice{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.choice button{text-align:left;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.94rem}
+.choice button.on{border-color:var(--lav);background:#35284f}
+.garden{margin-top:12px;border-radius:16px;padding:18px 16px;background:radial-gradient(circle at 80% 10%,rgba(232,198,106,.35),transparent 45%),linear-gradient(160deg,#2b1f45,#4a3478 60%,#7b5bb5);color:#fff;text-align:center}
+.garden .flow{font-size:2.4rem;letter-spacing:6px;margin:6px 0}
+.garden .t{font-size:.85rem;opacity:.85}
+.garden ul{list-style:none;padding:0;margin:10px 0;font-size:1.02rem;font-weight:700;line-height:1.8}
+.bloom{display:inline-block;animation:bloom .8s ease-out both}
+.garden li.bloom{display:block}
+@keyframes bloom{0%{transform:scale(.2) rotate(-30deg);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+/* check */
+.prog{font-size:.8rem;color:var(--mut)}
+.pbar{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin:6px 0 12px}
+.pbar div{height:100%;background:linear-gradient(90deg,#8e6bd6,#e8c66a);transition:width .25s}
+.qtext{font-size:1.05rem;font-weight:600;min-height:3.2em;margin:4px 0 12px}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.likert button{padding:12px 0 8px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:1.05rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px}
+.likert button span{font-size:.62rem;color:var(--mut);font-weight:400}
+.likert button.sel{border-color:var(--lav);background:#35284f}
+.bars{display:flex;flex-direction:column;gap:12px;margin:6px 0}
+.bar .bl{display:flex;justify-content:space-between;font-size:.86rem;margin-bottom:4px}
+.bar .bl b{font-variant-numeric:tabular-nums}
+.bar .bt{height:14px;border-radius:7px;background:var(--card2);overflow:hidden}
+.bar .bt div{height:100%;border-radius:7px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.verdict{text-align:center;font-size:1.3rem;font-weight:800;margin:12px 0 2px}
+.vsub{text-align:center;color:var(--mut);font-size:.9rem}
+.rx{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.rx div{background:var(--card2);border-radius:10px;padding:10px 12px;font-size:.92rem;border-left:3px solid var(--gold)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+.info h3{font-size:.98rem;margin:14px 0 4px;color:#e2d4ff}
+.info p{margin:4px 0;font-size:.92rem}
+.info ul{margin:4px 0;padding-left:20px;font-size:.92rem}
+.tagc{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.tagc span{font-size:.8rem;padding:3px 9px;border-radius:999px;background:#35284f;border:1px solid #5a4685}
+.arrow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center;font-size:.88rem;margin:6px 0}
+.arrow .box{background:var(--card2);border-radius:10px;padding:8px}
+a{color:#d5c2ff}
+footer{text-align:center;color:var(--mut);font-size:.78rem;margin-top:18px}
+footer a{color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🎨 나만의 색 팔레트<small>오늘의 감정을 고치지 말고, 색으로 남겨 보세요</small></h1>
+<div class="tabs">
+  <button class="on" data-tab="color">오늘의 내 색</button>
+  <button data-tab="thorn">가시를 꽃으로</button>
+  <button data-tab="check">감성 날씨</button>
+  <button data-tab="info">4번 한눈에</button>
+</div>
+
+<!-- ===== 오늘의 내 색 ===== -->
+<section id="tab-color">
+  <div class="card">
+    <h2>지금 마음에 있는 감정을 골라 보세요 <small style="color:var(--mut);font-weight:400">(최대 3개)</small></h2>
+    <div class="emos" id="emos"></div>
+    <div class="sliders" id="sliders"></div>
+    <div class="swatch" id="swatch"><div class="hex" id="hex"></div><div class="nm"><b id="cName">감정을 고르면 색이 섞입니다</b><span id="cDate"></span></div></div>
+    <div class="quote" id="quote">좋은 감정, 나쁜 감정은 없습니다. 고치려 하지 말고 그대로 바라보세요.</div>
+    <label class="f" for="memo">한 줄 메모 (선택)</label>
+    <input type="text" id="memo" maxlength="60" placeholder="예: 비 오는 퇴근길, 오래된 노래를 들었다">
+    <div class="row" style="margin-top:12px"><button class="btn sec" id="cCopy">색 이름 복사</button><button class="btn" id="cSave">팔레트에 저장</button></div>
+  </div>
+  <div class="card">
+    <h2>🗂️ 나의 감정 팔레트</h2>
+    <div id="histWrap"></div>
+    <p class="note">기록은 이 기기에만 저장됩니다(최근 60개). 색이 모이면 나만의 무늬가 보입니다.</p>
+  </div>
+</section>
+
+<!-- ===== 가시를 꽃으로 ===== -->
+<section id="tab-thorn" hidden>
+  <div class="card">
+    <h2>🌵 나는 누구와 나를 비교하고 있을까</h2>
+    <p class="note" style="margin-top:0">시기와 질투는 <b>내 가슴에 돋는 가시</b>입니다. 그 가시를 천천히 꽃으로 바꿔 봅시다.</p>
+    <label class="f" for="envy">① 요즘 부러운 것 (사람·상황·물건 무엇이든)</label>
+    <input type="text" id="envy" maxlength="50" placeholder="예: 친구의 여유로운 여행 사진">
+    <label class="f">② 이 부러움은…</label>
+    <div class="choice" id="why">
+      <button data-v="want">정말 내가 원하는 것이다 — 언젠가 해 보고 싶다</button>
+      <button data-v="lack">나에게 없다고 느끼는 마음이다 — 갖고 싶다기보다 허전하다</button>
+      <button data-v="both">둘 다인 것 같다</button>
+    </div>
+    <label class="f">③ 이미 가지고 있는 것 세 가지</label>
+    <input type="text" class="have" maxlength="40" placeholder="예: 내 얘기를 들어 주는 친구 한 명">
+    <input type="text" class="have" maxlength="40" placeholder="예: 매일 아침 마시는 따뜻한 커피" style="margin-top:6px">
+    <input type="text" class="have" maxlength="40" placeholder="예: 혼자서도 잘 노는 나의 취향" style="margin-top:6px">
+    <div class="row" style="margin-top:12px"><button class="btn" id="tGo">가시를 꽃으로 🌸</button></div>
+    <div id="garden"></div>
+  </div>
+</section>
+
+<!-- ===== 감성 날씨 ===== -->
+<section id="tab-check" hidden>
+  <div class="card" id="kIntro">
+    <h2>🌦️ 내 감성의 날씨 재기</h2>
+    <p style="margin:0">문장 12개를 읽고, 요즘의 나와 얼마나 비슷한지 1~5로 눌러 주세요.</p>
+    <p class="note">세 가지를 봅니다 — <b>깊이</b>(감수성), <b>가시</b>(비교·선망·고립), <b>균형</b>(일상을 꾸준히 사는 힘). 유형 진단이 아니라 누구나 해 볼 수 있는 감성 점검입니다.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" id="kStart">시작하기</button></div>
+    <p class="note" id="kLast"></p>
+  </div>
+  <div class="card" id="kQ" hidden>
+    <div class="prog" id="kProg"></div>
+    <div class="pbar"><div id="kBar"></div></div>
+    <div class="qtext" id="kText"></div>
+    <div class="likert" id="kLik"></div>
+    <div class="row" style="margin-top:12px"><button class="btn sec" id="kBack">← 이전</button></div>
+  </div>
+  <div class="card" id="kRes" hidden>
+    <div class="bars" id="kBars"></div>
+    <div class="verdict" id="vTitle"></div>
+    <div class="vsub" id="vSub"></div>
+    <div class="rx" id="rx"></div>
+    <div class="row" style="margin-top:14px"><button class="btn sec" id="kShare">결과 복사</button><button class="btn" id="kAgain">다시 재기</button></div>
+    <p class="note">이 점검은 성찰을 돕는 참고용이며 심리검사나 전문 상담을 대신하지 않습니다. 가라앉은 기분이 2주 이상 이어진다면 가까운 사람이나 전문가와 꼭 이야기해 보세요. 내 에니어그램 유형이 궁금하다면 <a href="https://woojuntaek-lgtm.github.io/enneagram-quick/" target="_blank" rel="noopener">에니어그램 빠른 체크</a>를 해 보세요.</p>
+  </div>
+</section>
+
+<!-- ===== 4번 한눈에 ===== -->
+<section id="tab-info" hidden>
+  <div class="card info">
+    <h2>🎨 에니어그램 4번 · 예술가</h2>
+    <p><b>나만의 색을 찾는 사람.</b> 감정이 가장 깊고 오래 머무는 사람입니다. "나는 좀 다른 것 같아요."</p>
+    <div class="tagc"><span>감정형(가슴 중심)</span><span>후퇴형 — 혼자만의 시공간</span><span>미덕: 균형</span><span>악덕: 선망</span><span>상징색: 보라</span></div>
+    <h3>감정형 세 유형의 차이</h3>
+    <p>2번은 남의 감정에 충실해 에너지가 <b>밖으로</b>, 3번은 상황에 따라 <b>유동적</b>, 4번은 자신의 감정에 충실해 에너지가 <b>안으로</b> 쏟아집니다.</p>
+    <h3>동양 수리로 보면 — 가을의 쇠(金)</h3>
+    <p>숫자 4는 음의 쇠(金), 계절은 가을, 방향은 서쪽, 색은 흰색, 십간으로는 신(辛). 움츠러들기 시작하는 상 — 날카로운 가을바람과 추풍낙엽. 찬 바람이 이는 가을에 감성이 충만해지는 예술가의 느낌입니다.</p>
+    <h3>두려움과 바람</h3>
+    <p>가장 두려운 것은 <b>평범하고 정체성이 없는 사람</b>이 되는 것. 그래서 나만의 색깔과 의미를 찾습니다. 특별함은 허영이 아니라 <b>나로 존재하기 위한 바람</b>입니다.</p>
+    <h3>같은 감수성, 두 얼굴</h3>
+    <div class="arrow"><div class="box">📡 안테나<br><small>창의적, 깊은 공감, 진정성</small></div><div>↔</div><div class="box">🌵 상처<br><small>깊은 감정→우울, 남다름→소외감, 독특함→고립</small></div></div>
+    <p>빛은 <b>나만의 우주를 창조하는 힘</b>, 그림자는 현실을 거부하고 환상 속으로 들어가는 모습(「욕망이라는 이름의 전차」의 블랑쉬).</p>
+    <h3>날개</h3>
+    <ul><li><b>4w3</b> — 표현하고 드러내는 쪽</li><li><b>4w5</b> — 안으로 파고들어 사색하는 쪽</li></ul>
+    <h3>스트레스와 성장</h3>
+    <div class="arrow"><div class="box">스트레스 → <b>2번처럼</b><br><small>사람에게 매달리고 맞춤</small></div><div>·</div><div class="box">성장 → <b>1번처럼</b><br><small>휩쓸리지 않고 침착하게 꾸준히</small></div></div>
+    <h3>아웃사이더 기질의 4번에게</h3>
+    <ul><li>고독은 모두가 느낀다.</li><li>자주 사람들과 어울려라.</li><li>부지런한 벌새의 아름다움을 찬미하라.</li><li>짧은 저녁놀보다 지루한 하루를.</li><li>시기 질투는 내 가슴에 돋는 가시.</li></ul>
+    <h3>4번과 잘 지내려면</h3>
+    <ul><li><b>특별함을 알아봐</b> 주세요.</li><li>감정을 <b>고치려 하지 말고 들어</b> 주세요.</li><li>혼자 있고 싶어 할 땐 존중하되, <b>가끔은 먼저 연락</b>해 주세요.</li></ul>
+    <h3>4번으로 추정되는 인물</h3>
+    <p style="font-size:.86rem;color:var(--mut)">쇼팽, 차이코프스키, 버지니아 울프, 헤르만 헤세, 알베르 카뮈, 마이클 잭슨 — 강의에서의 추정일 뿐 확정은 아닙니다.</p>
+    <p style="margin-top:14px;text-align:center;font-weight:700;color:#e2d4ff">평범한 날에도 당신은 충분히 특별한 사람입니다.</p>
+    <p class="note" style="text-align:center">유형은 사람을 가두는 상자가 아니라 지금 서 있는 곳을 알려 주는 지도입니다.</p>
+  </div>
+</section>
+
+<footer>© 2026 정필 수심명 · <a href="https://blog.naver.com/omyman" target="_blank" rel="noopener">blog.naver.com/omyman</a><br>「에니어그램 4번 예술가」 강의 부록 · 인터넷 없이 동작</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const URL_='https://woojuntaek-lgtm.github.io/artist-palette/';
+const store={get(k,d){try{const v=localStorage.getItem('palette_'+k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem('palette_'+k,JSON.stringify(v));}catch(e){}}};
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),1800);}
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('복사했습니다');}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('복사했습니다');}catch(_){toast('복사에 실패했습니다');}a.remove();}}
+const vib=n=>{try{navigator.vibrate&&navigator.vibrate(n);}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ===== 오늘의 내 색 ===== */
+const EMO=[
+ ['그리움','#9b7fd4','보랏빛'],['설렘','#ff9ec4','분홍빛'],['쓸쓸함','#7f93a8','회청빛'],['평온','#a8d98a','연둣빛'],
+ ['기쁨','#ffd75e','노란빛'],['감사','#ffa95e','주홍빛'],['슬픔','#5b8fd9','푸른'],['외로움','#3f4f8f','남빛'],
+ ['불안','#9a9aa3','잿빛'],['분노','#e05252','붉은'],['호기심','#4fc9bf','청록빛'],['자부심','#e8c66a','금빛']];
+const PLACE=['늦가을 저녁의','서쪽 하늘의','첫서리 내린 아침의','낙엽 쌓인 골목의','찬 바람 부는 오후의','비 그친 창가의','오래된 음반 속의','달빛 아래의','혼자 걷는 길의','한밤 일기장의'];
+const QUOTES=['고독은 모두가 느낀다. 나만 그런 게 아닙니다.','짧은 저녁놀보다 지루한 하루를 — 평범한 오늘도 충분히 아름답습니다.','부지런한 벌새의 아름다움을 찬미하라 — 꾸준함도 하나의 예술입니다.','좋은 감정, 나쁜 감정은 없습니다. 고치려 하지 말고 그대로 바라보세요.','오늘 이 색을 누군가와 나눠 보세요. 자주 사람들과 어울리는 것도 나를 지키는 일입니다.','평범한 날에도 당신은 충분히 특별한 사람입니다.'];
+let sel=[]; // {i,lv}
+const hex2rgb=h=>[1,3,5].map(k=>parseInt(h.slice(k,k+2),16));
+const rgb2hex=a=>'#'+a.map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+function mix(){let w=0,acc=[0,0,0];sel.forEach(s=>{const c=hex2rgb(EMO[s.i][1]);acc=acc.map((v,k)=>v+c[k]*s.lv);w+=s.lv;});return rgb2hex(acc.map(v=>v/w));}
+function seedRand(str){let h=2166136261;for(const ch of str)h=Math.imul(h^ch.charCodeAt(0),16777619);return ()=>((h=Math.imul(h^(h>>>15),2246822507)>>>0)%1000)/1000;}
+function cName(){if(!sel.length)return '';const s=[...sel].sort((a,b)=>b.lv-a.lv);const dom=EMO[s[0].i];
+  const r=seedRand(s.map(x=>x.i+':'+x.lv).join('|')+new Date().toDateString());
+  const place=PLACE[Math.floor(r()*PLACE.length)];
+  const names=s.map(x=>EMO[x.i][0]);const em=names.length===1?names[0]:names.length===2?`${names[0]}과 ${names[1]}`.replace(/([가-힣])과 /,(m,c)=>((c.charCodeAt(0)-0xAC00)%28?c+'과 ':c+'와 ')):`${names[0]}, ${names[1]}, 그리고 ${names[2]}`;
+  return `${place} ${dom[2]} ${em}`;}
+function renderEmos(){
+  $('#emos').innerHTML=EMO.map((e,i)=>{const s=sel.find(x=>x.i===i);return `<button class="emo${s?' sel':''}" data-i="${i}"><i style="background:${e[1]}"></i>${e[0]}<span class="lv">${s?'●'.repeat(s.lv):''}</span></button>`;}).join('');
+  $$('#emos .emo').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,k=sel.findIndex(x=>x.i===i);
+    if(k>=0)sel.splice(k,1);else{if(sel.length>=3){toast('감정은 3개까지 고를 수 있어요');return;}sel.push({i,lv:2});}vib(8);renderEmos();renderMix();});
+  $('#sliders').innerHTML=sel.map((s,k)=>`<div class="sl"><span>${EMO[s.i][0]}</span><input type="range" min="1" max="3" value="${s.lv}" data-k="${k}" aria-label="${EMO[s.i][0]} 세기"><span>${['','약','중','강'][s.lv]}</span></div>`).join('');
+  $$('#sliders input').forEach(r=>r.oninput=()=>{sel[+r.dataset.k].lv=+r.value;r.nextElementSibling.textContent=['','약','중','강'][+r.value];renderMix();
+    const b=$(`#emos .emo[data-i="${sel[+r.dataset.k].i}"] .lv`);if(b)b.textContent='●'.repeat(+r.value);});
+}
+function renderMix(){
+  const sw=$('#swatch');
+  if(!sel.length){sw.style.background='linear-gradient(135deg,#2b2440,#3a3150)';$('#cName').textContent='감정을 고르면 색이 섞입니다';$('#hex').textContent='';$('#cDate').textContent='';return;}
+  const m=mix(),cols=[...sel].sort((a,b)=>b.lv-a.lv).map(s=>EMO[s.i][1]);
+  sw.style.background=cols.length===1?`radial-gradient(circle at 30% 25%,rgba(255,255,255,.35),transparent 55%),${m}`:
+   `radial-gradient(circle at 25% 20%,rgba(255,255,255,.3),transparent 50%),linear-gradient(135deg,${cols.join(',')}),${m}`;
+  $('#hex').textContent=m.toUpperCase();$('#cName').textContent=cName();$('#cDate').textContent=new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'})+'의 내 색';
+  const r=seedRand(cName());$('#quote').textContent='🍂 '+QUOTES[Math.floor(r()*QUOTES.length)];
+}
+function renderHist(){const h=store.get('hist',[]);
+  if(!h.length){$('#histWrap').innerHTML='<div class="empty">아직 저장된 색이 없습니다. 오늘의 첫 색을 남겨 보세요.</div>';return;}
+  $('#histWrap').innerHTML=`<div class="hist">${h.map((e,k)=>`<button data-k="${k}" style="background:linear-gradient(135deg,${e.cols.join(',')})" title="${esc(e.name)}"><span>${e.d}</span></button>`).join('')}</div><p class="note" id="hInfo">칸을 누르면 그날의 색 이름이 보입니다.</p>`;
+  $$('#histWrap .hist button').forEach(b=>b.onclick=()=>{const e=h[+b.dataset.k];$('#hInfo').innerHTML=`<b>${esc(e.d)} · ${esc(e.name)}</b>${e.memo?'<br>“'+esc(e.memo)+'”':''} <a href="#" id="hDel">삭제</a>`;
+    $('#hDel').onclick=ev=>{ev.preventDefault();h.splice(+b.dataset.k,1);store.set('hist',h);renderHist();};});}
+$('#cSave').onclick=()=>{if(!sel.length){toast('먼저 감정을 골라 주세요');return;}
+  const h=store.get('hist',[]);const d=new Date();
+  h.unshift({d:`${d.getMonth()+1}/${d.getDate()}`,name:cName(),cols:[...sel].sort((a,b)=>b.lv-a.lv).map(s=>EMO[s.i][1]),hex:mix(),memo:$('#memo').value.trim()});
+  store.set('hist',h.slice(0,60));renderHist();toast('팔레트에 저장했습니다');vib(15);$('#memo').value='';};
+$('#cCopy').onclick=()=>{if(!sel.length){toast('먼저 감정을 골라 주세요');return;}
+  const memo=$('#memo').value.trim();copy(`🎨 오늘의 내 색: ${cName()} (${mix().toUpperCase()})${memo?'\n“'+memo+'”':''}\n${URL_}`);};
+renderEmos();renderMix();renderHist();
+
+/* ===== 가시를 꽃으로 ===== */
+let why='';
+$$('#why button').forEach(b=>b.onclick=()=>{why=b.dataset.v;$$('#why button').forEach(x=>x.classList.toggle('on',x===b));});
+const FL=['🌸','🌷','🌼','💐','🌺','🪻'];
+$('#tGo').onclick=()=>{
+  const envy=$('#envy').value.trim(),have=$$('.have').map(i=>i.value.trim()).filter(Boolean);
+  if(!envy){toast('① 부러운 것을 적어 주세요');return;}
+  if(!why){toast('② 하나를 골라 주세요');return;}
+  if(have.length<1){toast('③ 이미 가진 것을 하나 이상 적어 주세요');return;}
+  const msg={want:`정말 원하는 것이라면, 부러움은 <b>방향을 알려 주는 나침반</b>입니다. 오늘 할 수 있는 아주 작은 한 걸음은 무엇일까요?`,
+    lack:`허전함에서 온 부러움이라면, 그 자리는 <b>이미 가진 것</b>으로 채울 수 있습니다. 위의 꽃들을 천천히 다시 읽어 보세요.`,
+    both:`원하는 마음과 허전한 마음이 섞여 있네요. 원하는 쪽은 한 걸음으로, 허전한 쪽은 <b>이미 가진 것</b>으로 돌봐 주세요.`}[why];
+  const r=seedRand(envy+have.join());
+  $('#garden').innerHTML=`<div class="garden"><div class="t">🌵 ${esc(envy)}</div><div class="flow"><span id="th">🌵</span> → ${have.map((_,k)=>`<span class="bloom" style="animation-delay:${.3+k*.35}s">${FL[Math.floor(r()*FL.length)]}</span>`).join('')}</div>
+   <div class="t">이미 내 곁에 있는 것</div><ul>${have.map((h,k)=>`<li class="bloom" style="animation-delay:${.5+k*.35}s">${esc(h)}</li>`).join('')}</ul>
+   <div class="t" style="opacity:1;font-size:.9rem;line-height:1.6">${msg}</div></div>
+   <div class="row" style="margin-top:10px"><button class="btn sec" id="tCopy">꽃밭 복사</button><button class="btn sec" id="tReset">새로 쓰기</button></div>`;
+  vib(20);
+  $('#tCopy').onclick=()=>copy(`🌵 부러웠던 것: ${envy}\n🌸 이미 가진 것:\n${have.map(h=>'· '+h).join('\n')}\n시기 질투는 내 가슴에 돋는 가시 — 가시를 꽃으로.\n${URL_}`);
+  $('#tReset').onclick=()=>{$('#envy').value='';$$('.have').forEach(i=>i.value='');why='';$$('#why button').forEach(x=>x.classList.remove('on'));$('#garden').innerHTML='';};
+};
+
+/* ===== 감성 날씨 ===== */
+const Q=[
+ ['G','남들이 쉽게 지나치는 작은 감정도 오래 느낀다.'],
+ ['T','다른 사람이 가진 것이 자꾸 눈에 들어온다.'],
+ ['B','감정이 크게 일어도 해야 할 일은 꾸준히 해 나간다.'],
+ ['G','음악·글·그림에서 깊이 위로받는다.'],
+ ['T','나만 이해받지 못한다는 느낌이 든다.'],
+ ['B','이미 가진 것에 고마움을 자주 느낀다.'],
+ ['G','나만의 취향과 스타일이 분명하다.'],
+ ['T','기분이 가라앉으면 며칠씩 혼자 숨어 버린다.'],
+ ['B','가끔은 내가 먼저 사람들에게 연락한다.'],
+ ['G','남들과 똑같이 사는 건 나답지 않다고 느낀다.'],
+ ['T','지나간 일이나 놓친 것을 오래 곱씹는다.'],
+ ['B','평범한 하루에서도 아름다움을 찾는다.']
+];
+const LAB=['전혀\n아니다','아니다','보통','그렇다','매우\n그렇다'];
+let ki=0,ans=[];
+function kShow(){$('#kProg').textContent=`${ki+1} / ${Q.length}`;$('#kBar').style.width=(ki/Q.length*100)+'%';$('#kText').textContent=Q[ki][1];
+  $('#kLik').innerHTML=LAB.map((l,k)=>`<button data-v="${k+1}" class="${ans[ki]===k+1?'sel':''}">${k+1}<span>${l.replace('\n','<br>')}</span></button>`).join('');
+  $$('#kLik button').forEach(b=>b.onclick=()=>{ans[ki]=+b.dataset.v;b.classList.add('sel');vib(10);setTimeout(()=>{if(ki<Q.length-1){ki++;kShow();}else kResult();},160);});
+  $('#kBack').disabled=ki===0;}
+const score=dim=>{let s=0,n=0;Q.forEach((q,i)=>{if(q[0]===dim){s+=ans[i]-1;n++;}});return Math.round(s/(4*n)*100);};
+function verdict(G,T,B){
+  if(T>=60&&T>=B) return {t:'🌵 가시 주의보',s:'비교와 선망이 가슴에 가시처럼 돋기 쉬운 때 — 시선을 이미 가진 것으로',c:'#ff7b8a'};
+  if(G>=55&&B>=55) return {t:'🎨 균형 잡힌 예술가',s:'깊이 느끼면서도 일상을 꾸준히 — 세상을 물들이는 색',c:'#9be3b5'};
+  if(G>=55) return {t:'🍂 홀로 깊어지는 가을',s:'감수성은 풍부한데 일상과 사람 쪽 균형이 조금 얇아진 때',c:'#e8c66a'};
+  if(B>=55) return {t:'🕊️ 담백한 하루',s:'요란하지 않게, 평범한 날을 단단히 사는 중',c:'#9fc3ff'};
+  return {t:'🌫️ 잠시 흐린 날',s:'감정도 일상도 조금 멀게 느껴지는 때 — 작은 색 하나부터',c:'#b2a8c6'};}
+function rxList(G,T,B){const r=[];
+  if(T>=50) r.push('<b>시기 질투는 내 가슴에 돋는 가시.</b> "가시를 꽃으로" 탭에서 부러움을 이미 가진 것으로 바꿔 보세요.');
+  if(T>=50||B<50) r.push('<b>고독은 모두가 느낀다.</b> 나만 그런 게 아닙니다. 이번 주에 한 사람에게 먼저 연락해 보세요.');
+  if(B<55) r.push('<b>짧은 저녁놀보다 지루한 하루를.</b> 특별하지 않은 루틴 하나(산책·정리·물 마시기)를 꾸준히 해 보세요 — 4번의 성장 방향(1번)입니다.');
+  if(B<55) r.push('<b>부지런한 벌새의 아름다움을 찬미하라.</b> 꾸준함도 하나의 예술입니다.');
+  if(G>=55&&T<50&&B>=55) r.push('<b>지금 그대로 좋습니다.</b> 깊은 감성과 일상의 균형 — 그것이 4번의 미덕입니다.');
+  if(G<45) r.push('<b>감정에 이름을 붙여 보세요.</b> "오늘의 내 색" 탭에서 지금 감정을 색으로 남겨 보면 마음이 또렷해집니다.');
+  r.push('<b>평범한 날에도 당신은 충분히 특별한 사람입니다.</b> 특별해 보이려 애쓰지 않아도 되는 날을 허락해 주세요.');
+  return r.slice(0,4);}
+function kResult(){const G=score('G'),T=score('T'),B=score('B'),v=verdict(G,T,B);
+  $('#kQ').hidden=true;$('#kRes').hidden=false;
+  $('#kBars').innerHTML=[['깊이 · 감수성',G,'#c3a6ff'],['가시 · 비교·선망·고립',T,'#ff7b8a'],['균형 · 일상을 꾸준히',B,'#9be3b5']].map(([l,v,c])=>`<div class="bar"><div class="bl"><span>${l}</span><b style="color:${c}">${v}</b></div><div class="bt"><div style="background:${c}" data-w="${v}"></div></div></div>`).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$$('#kBars .bt div').forEach(d=>d.style.width=d.dataset.w+'%')));
+  $('#vTitle').textContent=v.t;$('#vTitle').style.color=v.c;$('#vSub').textContent=v.s;
+  $('#rx').innerHTML=rxList(G,T,B).map(t=>`<div>${t}</div>`).join('');
+  store.set('klast',{G,T,B,t:v.t,d:new Date().toLocaleDateString('ko-KR')});
+  $('#kShare').onclick=()=>copy(`[나만의 색 팔레트 · 감성 날씨] ${v.t}\n깊이 ${G} · 가시 ${T} · 균형 ${B}\n${v.s}\n${URL_}`);window.scrollTo(0,0);}
+$('#kStart').onclick=()=>{ki=0;ans=[];$('#kIntro').hidden=true;$('#kQ').hidden=false;kShow();};
+$('#kBack').onclick=()=>{if(ki>0){ki--;kShow();}};
+$('#kAgain').onclick=()=>{$('#kRes').hidden=true;$('#kIntro').hidden=false;kLast();};
+function kLast(){const l=store.get('klast',null);$('#kLast').textContent=l?`지난번(${l.d}): ${l.t} · 깊이 ${l.G} 가시 ${l.T} 균형 ${l.B}`:'';}
+kLast();
+
+/* ===== 탭 ===== */
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['color','thorn','check','info'].forEach(t=>$('#tab-'+t).hidden=t!==b.dataset.tab);window.scrollTo(0,0);});
+})();
+</script>
+</body>
+</html>
